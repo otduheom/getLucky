@@ -4,18 +4,6 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      // Пользователь имеет много альбомов
-      User.hasMany(models.Album, {
-        foreignKey: 'userId',
-        as: 'albums',
-      });
-
-      // Пользователь имеет много фотографий
-      User.hasMany(models.Photo, {
-        foreignKey: 'userId',
-        as: 'photos',
-      });
-
       // Связь многие-ко-многим для друзей через таблицу Friendship
       User.belongsToMany(models.User, {
         through: models.Friendship,
@@ -30,6 +18,18 @@ module.exports = (sequelize, DataTypes) => {
         as: 'friendOf',
         foreignKey: 'friendId',
         otherKey: 'userId',
+      });
+
+      // Пользователь отправляет много сообщений
+      User.hasMany(models.Message, {
+        foreignKey: 'senderId',
+        as: 'sentMessages',
+      });
+
+      // Пользователь получает много сообщений
+      User.hasMany(models.Message, {
+        foreignKey: 'receiverId',
+        as: 'receivedMessages',
       });
     }
 

@@ -1,0 +1,10 @@
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #28a745;
+    border: 2px solid white;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }

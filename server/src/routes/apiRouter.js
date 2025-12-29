@@ -4,6 +4,7 @@ const aiRouter = require('./ai.router');
 const profileRouter = require('./profileRouter');
 const friendsRouter = require('./friendsRouter');
 const searchRouter = require('./searchRouter');
+const messagesRouter = require('./messagesRouter');
 
 const apiRouter = express.Router();
 const { verifyAccessToken } = require('../middlewares/verifyTokens');
@@ -14,7 +15,7 @@ apiRouter.use('/ai', aiRouter);
 apiRouter.use('/profile', updateLastSeen, profileRouter);
 apiRouter.use('/friends', updateLastSeen, friendsRouter);
 apiRouter.use('/search', updateLastSeen, searchRouter);
-
+apiRouter.use('/messages', updateLastSeen, messagesRouter);
 apiRouter.get('/test', verifyAccessToken, (req, res) => {
   const user = res.locals.user;
   console.log('Декодированные данные пользователя из токена:', user);

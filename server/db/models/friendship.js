@@ -16,11 +16,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
 
-  Friendship.addHook('beforeCreate', (friendship) => {
-    if (friendship.userId === friendship.friendId) {
-      throw new Error('Пользователь не может добавить себя в друзья');
-    }
-  });
   Friendship.init(
     {
       userId: {
@@ -51,6 +46,14 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'Friendships',
     },
   );
+
+  // Хук должен быть добавлен ПОСЛЕ init()
+  Friendship.addHook('beforeCreate', (friendship) => {
+    if (friendship.userId === friendship.friendId) {
+      throw new Error('Пользователь не может добавить себя в друзья');
+    }
+  });
+
   return Friendship;
 };
 

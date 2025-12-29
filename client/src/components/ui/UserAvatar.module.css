@@ -1,0 +1,43 @@
+.avatar {
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #6c757d;
+    color: white;
+    font-weight: bold;
+    position: relative;
+  }
+  
+  .sm {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+  
+  .md {
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+  }
+  
+  .lg {
+    width: 80px;
+    height: 80px;
+    font-size: 24px;
+  }
+  
+  .image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
