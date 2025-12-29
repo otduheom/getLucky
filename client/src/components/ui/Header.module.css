@@ -1,0 +1,86 @@
+.header {
+  width: 100%;
+  background: rgba(20, 20, 25, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(100, 50, 150, 0.3);
+}
+
+.navContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.navList {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2rem;
+  align-items: center;
+}
+
+.navList li {
+  margin: 0;
+}
+
+.navLink {
+  text-decoration: none;
+  color: #c0c0c0;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  display: block;
+}
+
+.navLink:hover {
+  background: rgba(100, 50, 150, 0.2);
+  color: #b886db;
+}
+
+.navLink.active {
+  background: linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(138, 43, 226, 0.4);
+}
+
+.navLink.active:hover {
+  background: linear-gradient(135deg, #7b1fa2 0%, #5e35b1 100%);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(138, 43, 226, 0.6);
+}
+
+.userName {
+  color: #b886db;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .navContainer {
+    padding: 0 1rem;
+  }
+
+  .nav {
+    justify-content: flex-start;
+  }
+
+  .navList {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+
