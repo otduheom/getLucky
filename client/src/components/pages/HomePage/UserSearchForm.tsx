@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import SearchApi from '../../../entities/search/SearchApi';
+import SearchApi, { SearchUser } from '../../../entities/search/searchApi';
 import UserCard from './UserCard';
 
 export default function UserSearchForm() {
