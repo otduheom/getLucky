@@ -1,5 +1,6 @@
 const { User, Friendship } = require('../../db/models');
 const { Op } = require('sequelize');
+const path = require('path');
 
 class FriendsService {
   static async getFriends(userId) {
@@ -15,48 +16,81 @@ class FriendsService {
           model: User,
           as: 'user',
           attributes: { exclude: ['password'] },
-          where: { id: { [Op.ne]: userId } },
-          required: false,
+          required: true,
         },
         {
           model: User,
           as: 'friend',
           attributes: { exclude: ['password'] },
-          where: { id: { [Op.ne]: userId } },
-          required: false,
+          required: true,
         },
       ],
     });
 
     // преобразуем в список пользователей
-    const friends = friendships.map((friendship) => {
-      const friend = friendship.user == userId ? friendship.friend : friendship.user;
-      return friend.get();
-    });
+    const friends = friendships
+      .map((friendship) => {
+        // Если текущий пользователь - это userId в friendship, то друг - это friend
+        // Если текущий пользователь - это friendId в friendship, то друг - это user
+        const friend = friendship.userId === userId ? friendship.friend : friendship.user;
+        if (!friend) {
+          return null;
+        }
+        const friendData = friend.get({ plain: true });
+        // Убеждаемся, что мы не возвращаем текущего пользователя
+        if (friendData.id === userId) {
+          return null;
+        }
+        // Нормализуем путь к аватару
+        if (friendData.avatar) {
+          friendData.avatar = `/uploads/avatars/${path.basename(friendData.avatar)}`;
+        }
+        return friendData;
+      })
+      .filter(friend => friend !== null); // Убираем null значения
+    
     return friends;
   }
 
   static async getPopularUsers(limit = 100) {
-    const users = await User.findAll({
-      attributes: {
-        exclude: ['password'],
-        include: [
-          [
-            User.sequelize.literal(`(
-                        SELECT COUNT(*)
-                        FROM "Friendships"
-              WHERE (("Friendships"."userId" = "User"."id" OR "Friendships"."friendId" = "User"."id")
-              AND "Friendships"."status" = 'accepted')
-            )`),
-            'friendsCount',
-          ],
-        ],
-      },
-      order: [[User.sequelize.literal('friendsCount'), 'DESC']],
-      limit,
-    });
+    try {
+      // Используем более простой подход - сначала получаем всех пользователей,
+      // затем считаем друзей для каждого
+      const users = await User.findAll({
+        attributes: { exclude: ['password'] },
+        limit,
+      });
 
-    return users.map((user) => user.get());
+      // Для каждого пользователя считаем количество друзей
+      const usersWithFriendsCount = await Promise.all(
+        users.map(async (user) => {
+          const friendsCount = await Friendship.count({
+            where: {
+              [Op.or]: [
+                { userId: user.id, status: 'accepted' },
+                { friendId: user.id, status: 'accepted' },
+              ],
+            },
+          });
+
+          const userData = user.get({ plain: true });
+          userData.friendsCount = friendsCount;
+          // Нормализуем путь к аватару
+          if (userData.avatar) {
+            userData.avatar = `/uploads/avatars/${path.basename(userData.avatar)}`;
+          }
+          return userData;
+        })
+      );
+
+      // Сортируем по количеству друзей
+      usersWithFriendsCount.sort((a, b) => b.friendsCount - a.friendsCount);
+
+      return usersWithFriendsCount;
+    } catch (error) {
+      console.error('Error in getPopularUsers service:', error);
+      throw error;
+    }
   }
 
   static async sendFriendRequest(userId, friendId) {
@@ -83,7 +117,7 @@ class FriendsService {
   }
 
   static async acceptFriendRequest(requestId, userId) {
-    const friendship = await friendship.findOne({
+    const friendship = await Friendship.findOne({
       where: {
         id: requestId,
         friendId: userId,
@@ -95,7 +129,9 @@ class FriendsService {
     }
 
     await friendship.update({ status: 'accepted' });
-    return { success: true, friendship };
+    
+    // Преобразуем объект Sequelize в plain объект
+    return { success: true, friendship: friendship.get() };
   }
 
   static async removeFriend(userId, friendId) {
@@ -157,7 +193,13 @@ class FriendsService {
     const friends = friendships
       .map((friendship) => {
         const friend = friendship.userId === userId ? friendship.friend : friendship.user;
-        return friend?.get();
+        if (!friend) return null;
+        const friendData = friend.get({ plain: true });
+        // Нормализуем путь к аватару
+        if (friendData.avatar) {
+          friendData.avatar = `/uploads/avatars/${path.basename(friendData.avatar)}`;
+        }
+        return friendData;
       })
       .filter(Boolean);
 
@@ -179,20 +221,12 @@ class FriendsService {
           model: User,
           as: 'user',
           attributes: { exclude: ['password'] },
-          where: {
-            id: { [Op.ne]: userId },
-            lastSeen: { [Op.gte]: fiveMinutesAgo },
-          },
           required: false,
         },
         {
           model: User,
           as: 'friend',
           attributes: { exclude: ['password'] },
-          where: {
-            id: { [Op.ne]: userId },
-            lastSeen: { [Op.gte]: fiveMinutesAgo },
-          },
           required: false,
         },
       ],
@@ -201,11 +235,86 @@ class FriendsService {
     const friends = friendships
       .map((friendship) => {
         const friend = friendship.userId === userId ? friendship.friend : friendship.user;
-        return friend?.get();
+        if (!friend) return null;
+        const friendData = friend.get({ plain: true });
+        // Убеждаемся, что мы не возвращаем текущего пользователя
+        if (friendData.id === userId) {
+          return null;
+        }
+        // Проверяем, что lastSeen в пределах 5 минут
+        if (!friendData.lastSeen || new Date(friendData.lastSeen) < fiveMinutesAgo) {
+          return null; // Не онлайн
+        }
+        // Нормализуем путь к аватару
+        if (friendData.avatar) {
+          friendData.avatar = `/uploads/avatars/${path.basename(friendData.avatar)}`;
+        }
+        return friendData;
       })
       .filter(Boolean);
 
     return friends;
+  }
+
+  static async getFriendRequests(userId) {
+    // Получаем входящие заявки (где текущий пользователь - получатель)
+    const requests = await Friendship.findAll({
+      attributes: ['id', 'userId', 'friendId', 'status', 'createdAt', 'updatedAt'], // Явно указываем все нужные поля
+      where: {
+        friendId: userId,
+        status: 'pending',
+      },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: { exclude: ['password'] },
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    const result = requests.map((request) => {
+      // Используем напрямую поля объекта Sequelize
+      const userData = request.user ? request.user.get({ plain: true }) : null;
+      // Нормализуем путь к аватару
+      if (userData && userData.avatar) {
+        userData.avatar = `/uploads/avatars/${path.basename(userData.avatar)}`;
+      }
+      
+      return {
+        id: request.id, // Используем напрямую request.id
+        user: userData,
+        createdAt: request.createdAt,
+      };
+    });
+
+    console.log('getFriendRequests - first request:', requests[0] ? { id: requests[0].id, userId: requests[0].userId, friendId: requests[0].friendId } : 'no requests');
+    console.log('getFriendRequests result:', result);
+    
+    return result;
+  }
+
+  static async getFriendshipStatus(userId, friendId) {
+    // Проверяем статус дружбы между двумя пользователями
+    const friendship = await Friendship.findOne({
+      where: {
+        [Op.or]: [
+          { userId, friendId },
+          { userId: friendId, friendId: userId },
+        ],
+      },
+    });
+
+    if (!friendship) {
+      return { status: 'none' }; // Нет связи
+    }
+
+    return {
+      status: friendship.status, // 'pending', 'accepted', 'blocked'
+      friendshipId: friendship.id,
+      isRequester: friendship.userId === userId, // Текущий пользователь отправил заявку
+    };
   }
 }
 

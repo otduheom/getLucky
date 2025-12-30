@@ -42,4 +42,14 @@ export default class FriendsApi {
   static async removeFriend(friendId: number): Promise<void> {
     await axiosInstance.delete(`/friends/${friendId}`);
   }
+
+  static async getFriendRequests(): Promise<Array<{ id: number; user: Friend; createdAt: string }>> {
+    const response = await axiosInstance.get('/friends/requests');
+    return response.data;
+  }
+
+  static async getFriendshipStatus(friendId: number): Promise<{ status: 'none' | 'pending' | 'accepted' | 'blocked'; friendshipId?: number; isRequester?: boolean }> {
+    const response = await axiosInstance.get(`/friends/status/${friendId}`);
+    return response.data;
+  }
 }

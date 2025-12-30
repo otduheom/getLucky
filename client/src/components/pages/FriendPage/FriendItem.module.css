@@ -1,0 +1,126 @@
+.friendItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  background: #ffffff;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.friendItem:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.avatarContainer {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #212121;
+}
+
+.city {
+  margin: 4px 0 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.removeButton {
+  padding: 6px 12px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.removeButton:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.removeButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .friendItem {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .name {
+    font-size: 15px;
+  }
+
+  .city {
+    font-size: 13px;
+  }
+
+  .actions {
+    gap: 6px;
+  }
+
+  .removeButton {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .friendItem {
+    padding: 8px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .info {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+
+  .name {
+    font-size: 14px;
+  }
+
+  .city {
+    font-size: 12px;
+  }
+
+  .actions {
+    gap: 4px;
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+
+  .removeButton {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+

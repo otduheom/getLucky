@@ -3,6 +3,7 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 const app = require('./app');
 const { setupSocket } = require('./socket/socketHandler');
+const { setIO } = require('./socket/socketInstance');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3001;
@@ -18,6 +19,9 @@ const io = new Server(httpServer, {
     credentials: true
   }
 });
+
+// Сохраняем экземпляр io для использования в контроллерах
+setIO(io);
 
 // Настраиваем обработчики сокетов
 setupSocket(io);

@@ -7,10 +7,16 @@ import LoginPage from './components/pages/LoginPage';
 import SignUpPage from './components/pages/SignUpPage';
 import axiosInstance, { setAccessToken } from './shared/lib/axiosInstance';
 import ProtectedRoute from './components/HOCs/ProtectedRoute';
+import ProfilePage from './components/pages/ProfilePage';
+import FriendsPage from './components/pages/FriendsPage';
+import ChatsPage from './components/pages/ChatsPage';
+import ChatPage from './components/pages/ChatPage';
+
 
 interface User {
   status: 'logging' | 'logged' | 'guest';
   data: {
+    id: number;  // Добавить id
     name: string;
     email: string;
   } | null;
@@ -42,6 +48,38 @@ function App() {
           {
             path: '/',
             element: <MainPage user={user} />,
+          },
+          {
+            path: '/profile/:userId?',
+            element: (
+              <ProtectedRoute isAllowed={!isGuest} redirectTo="/login">
+                <ProfilePage currentUserId={user?.data?.id} />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: '/friends',
+            element: (
+              <ProtectedRoute isAllowed={!isGuest} redirectTo="/login">
+                <FriendsPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: '/chats',
+            element: (
+              <ProtectedRoute isAllowed={!isGuest} redirectTo="/login">
+                <ChatsPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: '/chat/:friendId',
+            element: (
+              <ProtectedRoute isAllowed={!isGuest} redirectTo="/login">
+                <ChatPage currentUserId={user?.data?.id} />
+              </ProtectedRoute>
+            ),
           },
           {
             path: '/signup',

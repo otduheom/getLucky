@@ -8,13 +8,14 @@ class FriendsController {
       return res.status(200).json(friends);
     } catch (error) {
       console.error('Error in getFriends:', error);
-      return res.status(500).json({ message: 'Ошибка сервера' });
+      console.error('Error stack:', error.stack);
+      return res.status(500).json({ message: 'Ошибка сервера', error: error.message });
     }
   }
 
   static async getPopularUsers(req, res) {
     try {
-      const limit = parseInt(req.query.limit) || 100;
+      const limit = parseInt(req.query.limit, 10) || 100;
       const users = await FriendsService.getPopularUsers(limit);
       
       // Перемешиваем и берем первые 10 для главной страницы
@@ -24,7 +25,8 @@ class FriendsController {
       return res.status(200).json(randomUsers);
     } catch (error) {
       console.error('Error in getPopularUsers:', error);
-      return res.status(500).json({ message: 'Ошибка сервера' });
+      console.error('Error stack:', error.stack);
+      return res.status(500).json({ message: 'Ошибка сервера', error: error.message });
     }
   }
 
@@ -51,7 +53,7 @@ class FriendsController {
       const userId = res.locals.user.id;
       const { requestId } = req.params;
       
-      const result = await FriendsService.acceptFriendRequest(parseInt(requestId), userId);
+      const result = await FriendsService.acceptFriendRequest(parseInt(requestId, 10), userId);
       
       if (!result.success) {
         return res.status(404).json({ message: result.message });
@@ -60,7 +62,7 @@ class FriendsController {
       return res.status(200).json({ message: 'Заявка принята', friendship: result.friendship });
     } catch (error) {
       console.error('Error in acceptFriendRequest:', error);
-      return res.status(500).json({ message: 'Ошибка сервера' });
+      return res.status(500).json({ message: 'Ошибка сервера', error: error.message });
     }
   }
 
@@ -106,6 +108,29 @@ class FriendsController {
       return res.status(200).json(friends);
     } catch (error) {
       console.error('Error in getOnlineFriends:', error);
+      return res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
+
+  static async getFriendRequests(req, res) {
+    try {
+      const userId = res.locals.user.id;
+      const requests = await FriendsService.getFriendRequests(userId);
+      return res.status(200).json(requests);
+    } catch (error) {
+      console.error('Error in getFriendRequests:', error);
+      return res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
+
+  static async getFriendshipStatus(req, res) {
+    try {
+      const userId = res.locals.user.id;
+      const { friendId } = req.params;
+      const status = await FriendsService.getFriendshipStatus(userId, parseInt(friendId, 10));
+      return res.status(200).json(status);
+    } catch (error) {
+      console.error('Error in getFriendshipStatus:', error);
       return res.status(500).json({ message: 'Ошибка сервера' });
     }
   }

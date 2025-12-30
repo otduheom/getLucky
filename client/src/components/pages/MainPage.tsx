@@ -1,3 +1,5 @@
+import PopularUsersList from './HomePage/PopularUsersList';
+import UserSearchForm from './HomePage/UserSearchForm';
 import styles from './MainPage.module.css';
 
 interface MainPageProps {
@@ -13,18 +15,16 @@ interface MainPageProps {
 export default function MainPage({ user }: MainPageProps) {
   return (
     <div className={styles.pageContainer}>
-      <h1 className={styles.mainTitle}>Расклад на Таро</h1>
+      <h1 className={styles.title}>Главная страница</h1>
+      
       {user?.status === 'logged' ? (
-        <div className={styles.guestMessage}>
-          <p className={styles.guestMessageText}>
-            Добро пожаловать! Функционал расклада скоро будет доступен.
-          </p>
-        </div>
+        <>
+          <UserSearchForm />
+          <PopularUsersList />
+        </>
       ) : (
         <div className={styles.guestMessage}>
-          <p className={styles.guestMessageText}>
-            Войдите в систему, чтобы получить расклад на картах Таро.
-          </p>
+          <p>Войдите в систему, чтобы увидеть популярных пользователей и найти новых друзей.</p>
         </div>
       )}
     </div>

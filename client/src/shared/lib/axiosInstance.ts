@@ -10,6 +10,10 @@ export function setAccessToken(newToken: string): void {
   accessToken = newToken;
 }
 
+export function getAccessToken(): string {
+  return accessToken;
+}
+
 axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (!config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${accessToken}`;

@@ -41,7 +41,36 @@ function Header({ user, setUser }: HeaderProps) {
             {user?.status === 'logged' ? (
               <>
                 <li>
-                  <span className={styles.userName}>{user?.data?.name}</span>
+                  <NavLink
+                    to="/profile"
+                    className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}
+                  >
+                    Профиль
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/friends"
+                    className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}
+                  >
+                    Друзья
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/chats"
+                    className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}
+                  >
+                    Чаты
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/profile"
+                    className={styles.userName}
+                  >
+                    {user?.data?.name}
+                  </NavLink>
                 </li>
                 <li>
                   <NavLink

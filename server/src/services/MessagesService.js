@@ -1,5 +1,6 @@
 const { Message, User, Friendship } = require('../../db/models');
 const { Op } = require('sequelize');
+const path = require('path');
 
 class MessagesService {
   static async getMessagesWithFriend(userId, friendId) {
@@ -138,8 +139,14 @@ class MessagesService {
           },
         });
 
+        const friendData = friend.get({ plain: true });
+        // Нормализуем путь к аватару
+        if (friendData.avatar) {
+          friendData.avatar = `/uploads/avatars/${path.basename(friendData.avatar)}`;
+        }
+        
         return {
-          friend: friend.get(),
+          friend: friendData,
           lastMessage: lastmessage ? lastmessage.get() : null,
           unreadCount,
         };

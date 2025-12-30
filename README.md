@@ -88,10 +88,10 @@ GetLucky - это полнофункциональная социальная с
 #### 1.3 Настройка связей (associations)
 
 - User.belongsToMany(User, { through: Friendship, as: 'Friends', foreignKey: 'userId', otherKey: 'friendId' }) ✅
-- User.hasMany(Message, { foreignKey: 'senderId', as: 'sentMessages' })
-- User.hasMany(Message, { foreignKey: 'receiverId', as: 'receivedMessages' })
-- Message.belongsTo(User, { foreignKey: 'senderId', as: 'sender' })
-- Message.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' })
+- User.hasMany(Message, { foreignKey: 'senderId', as: 'sentMessages' }) ✅
+- User.hasMany(Message, { foreignKey: 'receiverId', as: 'receivedMessages' }) ✅
+- Message.belongsTo(User, { foreignKey: 'senderId', as: 'sender' }) ✅
+- Message.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' }) ✅
 
 ---
 
@@ -182,85 +182,91 @@ GetLucky - это полнофункциональная социальная с
 
 ---
 
-### Этап 5: Frontend - Компоненты и страницы
+### Этап 5: Frontend - Компоненты и страницы ✅
 
-#### 5.1 Главная страница (`client/src/components/pages/HomePage.tsx`)
+#### 5.1 Главная страница (`client/src/components/pages/MainPage.tsx`) ✅
 
-- Компонент `PopularUsersList` - список популярных пользователей
-- Компонент `UserCard` - карточка пользователя (фото, ФИО/ник, кнопка "Добавить в друзья")
-- Компонент `UserSearchForm` - форма поиска пользователей
-- Использование API: `GET /api/friends/popular`, `GET /api/search/users`
+- Компонент `PopularUsersList` - список популярных пользователей ✅
+- Компонент `UserCard` - карточка пользователя (фото, ФИО/ник, кнопка "Добавить в друзья") ✅
+- Компонент `UserSearchForm` - форма поиска пользователей ✅
+- Использование API: `GET /api/friends/popular`, `GET /api/search/users` ✅
 
-#### 5.2 Страница профиля (`client/src/components/pages/ProfilePage.tsx`)
+#### 5.2 Страница профиля (`client/src/components/pages/ProfilePage.tsx`) ✅
 
-- Компонент `ProfileHeader` - аватар, кнопка редактирования
-- Компонент `ProfileEditForm` - форма редактирования анкеты
-- Компонент `FriendsList` - список друзей с индикатором онлайн
-- Компонент `MessageButton` - кнопка "Написать сообщение" для друга
-- Использование API: `GET /api/profile/:userId`, `PUT /api/profile`, `POST /api/profile/avatar`
+- Компонент `ProfileHeader` - аватар, кнопка редактирования ✅
+- Компонент `ProfileEditForm` - форма редактирования анкеты ✅
+- Компонент `FriendsList` - список друзей с индикатором онлайн ✅
+- Компонент `MessageButton` - кнопка "Написать сообщение" для друга ✅
+- Использование API: `GET /api/profile/:userId`, `PUT /api/profile`, `POST /api/profile/avatar` ✅
 
-#### 5.3 Страница друзей (`client/src/components/pages/FriendsPage.tsx`)
+#### 5.3 Страница друзей (`client/src/components/pages/FriendsPage.tsx`) ✅
 
-- Компонент `FriendsList` - список всех друзей
-- Компонент `FriendSearchForm` - поиск по друзьям
-- Компонент `FriendItem` - элемент списка (аватарка, ФИО/ник, ссылка на профиль, кнопка "Написать")
-- Использование API: `GET /api/friends`, `GET /api/friends/search`
+- Компонент `FriendsList` - список всех друзей ✅
+- Компонент `FriendSearchForm` - поиск по друзьям ✅
+- Компонент `FriendItem` - элемент списка (аватарка, ФИО/ник, ссылка на профиль, кнопка "Написать") ✅
+- Использование API: `GET /api/friends`, `GET /api/friends/search` ✅
 
-#### 5.4 Страница списка чатов (`client/src/components/pages/ChatsPage.tsx`)
+#### 5.4 Страница списка чатов (`client/src/components/pages/ChatsPage.tsx`) ✅
 
-- Компонент `ChatsList` - список всех диалогов
-- Компонент `ChatItem` - элемент списка (аватар друга, имя, последнее сообщение, время, индикатор непрочитанных)
-- Компонент `ChatSearchForm` - поиск по чатам
-- Использование API: `GET /api/messages/chats`, `GET /api/messages/unread-count`
+- Компонент `ChatsList` - список всех диалогов ✅
+- Компонент `ChatItem` - элемент списка (аватар друга, имя, последнее сообщение, время, индикатор непрочитанных) ✅
+- Компонент `ChatSearchForm` - поиск по чатам ✅
+- Использование API: `GET /api/messages/chats`, `GET /api/messages/unread-count` ✅
 
-#### 5.5 Страница чата (`client/src/components/pages/ChatPage.tsx`)
+#### 5.5 Страница чата (`client/src/components/pages/ChatPage.tsx`) ✅
 
-- Компонент `ChatHeader` - информация о собеседнике (аватар, имя, онлайн статус)
-- Компонент `MessagesList` - список сообщений (с автоскроллом)
-- Компонент `MessageItem` - отдельное сообщение (отправленное/полученное, время)
-- Компонент `MessageInput` - форма отправки сообщения
-- Использование API: `GET /api/messages/chat/:friendId`, `POST /api/messages`, `PUT /api/messages/chat/:friendId/read-all`
+- Компонент `ChatHeader` - информация о собеседнике (аватар, имя, онлайн статус) ✅
+- Компонент `MessagesList` - список сообщений (с автоскроллом) ✅
+- Компонент `MessageItem` - отдельное сообщение (отправленное/полученное, время) ✅
+- Компонент `MessageInput` - форма отправки сообщения ✅
+- Использование API: `GET /api/messages/chat/:friendId`, `POST /api/messages`, `PUT /api/messages/chat/:friendId/read-all` ✅
 
-#### 5.6 Компоненты UI
+#### 5.6 Компоненты UI ✅
 
-- `OnlineIndicator` - зеленый кружочек для онлайн статуса
-- `UserAvatar` - компонент аватара с fallback
-- `AddFriendButton` - кнопка добавления в друзья
-- `UnreadBadge` - бейдж с количеством непрочитанных сообщений
+- `OnlineIndicator` - зеленый кружочек для онлайн статуса ✅
+- `UserAvatar` - компонент аватара с fallback ✅
+- `AddFriendButton` - кнопка добавления в друзья ✅
+- `UnreadBadge` - бейдж с количеством непрочитанных сообщений ✅
+- `MessageButton` - кнопка "Написать сообщение" ✅
 
 ---
 
-### Этап 6: Frontend - API клиенты
+### Этап 6: Frontend - API клиенты ✅
 
-#### 6.1 API модули (`client/src/entities/`)
+#### 6.1 API модули (`client/src/entities/`) ✅
 
-- `profile/ProfileApi.ts` - API для профилей
-- `friends/FriendsApi.ts` - API для друзей
-- `messages/MessagesApi.ts` - API для сообщений и чатов
-- `search/SearchApi.ts` - API для поиска
+- `profile/ProfileApi.ts` - API для профилей ✅
+- `friends/FriendsApi.ts` - API для друзей ✅
+- `messages/MessagesApi.ts` - API для сообщений и чатов ✅
+- `search/SearchApi.ts` - API для поиска ✅
 
-#### 6.2 Обновление роутинга (`client/src/App.tsx`)
+#### 6.2 Обновление роутинга (`client/src/App.tsx`) ✅
 
-- Добавить маршруты:
-  - `/friends` → FriendsPage
-  - `/profile/:userId?` → ProfilePage
-  - `/chats` → ChatsPage
-  - `/chat/:friendId` → ChatPage
+- Добавлены маршруты: ✅
+  - `/friends` → FriendsPage ✅
+  - `/profile/:userId?` → ProfilePage ✅
+  - `/chats` → ChatsPage ✅
+  - `/chat/:friendId` → ChatPage ✅
+
+#### 6.3 Socket.io клиент ✅
+
+- `shared/lib/socketInstance.ts` - инициализация и управление WebSocket соединением ✅
 
 ---
 
 ### Этап 7: Улучшения и оптимизация
 
-#### 7.1 Реализация онлайн статуса
+#### 7.1 Реализация онлайн статуса ✅
 
-- WebSocket или периодический polling для обновления lastSeen
-- Сервис для определения онлайн (например, lastSeen < 5 минут = онлайн)
+- Обновление lastSeen через middleware `updateLastSeen` ✅
+- Определение онлайн статуса через проверку lastSeen (lastSeen < 5 минут = онлайн) ✅
+- Отображение онлайн статуса в UI через компонент `OnlineIndicator` ✅
 
-#### 7.2 Реализация реального времени для чата
+#### 7.2 Реализация реального времени для чата ✅
 
-- WebSocket соединение для отправки/получения сообщений в реальном времени
-- Альтернатива: периодический polling (менее эффективно, но проще)
-- Обновление списка чатов при новых сообщениях
+- WebSocket соединение для отправки/получения сообщений в реальном времени ✅
+- Реализовано через Socket.io ✅
+- Обновление списка чатов при новых сообщениях ✅
 
 #### 7.3 Пагинация
 
@@ -268,11 +274,11 @@ GetLucky - это полнофункциональная социальная с
 - Backend: query параметры `limit`, `offset`
 - Frontend: бесконечная прокрутка или кнопка "Загрузить еще"
 
-#### 7.4 Уведомления
+#### 7.4 Уведомления (частично)
 
-- Уведомления о новых сообщениях
-- Уведомления о новых заявках в друзья
-- Счетчики непрочитанных
+- Счетчики непрочитанных сообщений ✅ (реализовано через API)
+- Уведомления о новых сообщениях (можно добавить браузерные уведомления)
+- Уведомления о новых заявках в друзья (можно добавить)
 
 #### 7.5 Оптимизация
 
@@ -337,11 +343,10 @@ GetLucky - это полнофункциональная социальная с
 1. ✅ **Этап 1**: Расширение модели User + создание моделей Friendship и Message
 2. ✅ **Этап 2**: Backend API для профилей и друзей
 3. ✅ **Этап 3**: Backend API для чата + WebSocket (Socket.io)
-4. **Этап 4**: Frontend - главная страница и поиск
-5. **Этап 5**: Frontend - страница профиля
-6. **Этап 6**: Frontend - страница друзей
-7. **Этап 7**: Frontend - страница чатов и отдельный чат
-8. **Этап 8**: Улучшения (пагинация, оптимизация)
+4. ✅ **Этап 4**: Backend - Middleware и утилиты
+5. ✅ **Этап 5**: Frontend - Компоненты и страницы
+6. ✅ **Этап 6**: Frontend - API клиенты и роутинг
+7. **Этап 7**: Улучшения (пагинация, оптимизация, уведомления)
 
 ---
 

@@ -1,0 +1,65 @@
+.header {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.avatarContainer {
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #212121;
+  margin: 0 0 2px 0;
+}
+
+.status {
+  font-size: 13px;
+  color: #707579;
+  margin: 0;
+}
+
+.status.online {
+  color: #3390ec;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px 16px;
+  }
+
+  .name {
+    font-size: 15px;
+  }
+
+  .status {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 8px 12px;
+  }
+
+  .name {
+    font-size: 14px;
+  }
+
+  .status {
+    font-size: 11px;
+  }
+}
+

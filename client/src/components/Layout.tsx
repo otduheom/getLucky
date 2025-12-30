@@ -21,13 +21,6 @@ function Layout({ user, setUser }: LayoutProps) {
       <div className={styles.content}>
         <Outlet />
       </div>
-      {/* Футер с цитатой */}
-      <footer className={styles.footer}>
-        <p className={styles.quote}>
-          "Мы не можем выбирать какие карты сдает нам судьба, но мы можем выбирать как сыграть
-          этими картами, чтобы выиграть партию" — Китами Масао
-        </p>
-      </footer>
     </div>
   );
 }

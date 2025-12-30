@@ -19,8 +19,9 @@ const avatarStorage = multer.diskStorage({
     cb(null, avatarsDir);
   },
   filename: (req, file, cb) => {
+    const userId = req.user?.id || 'unknown';
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `avatar-${req.user.id}-${uniqueSuffix}${path.extname(file.originalname)}`);
+    cb(null, `avatar-${userId}-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });
 
@@ -30,8 +31,9 @@ const photoStorage = multer.diskStorage({
     cb(null, photosDir);
   },
   filename: (req, file, cb) => {
+    const userId = req.user?.id || 'unknown';
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `photo-${req.user.id}-${uniqueSuffix}${path.extname(file.originalname)}`);
+    cb(null, `photo-${userId}-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });
 

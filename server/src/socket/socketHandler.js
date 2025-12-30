@@ -27,12 +27,22 @@ const setupSocket = (io) => {
   // Middleware для аутентификации
   io.use(authenticateSocket);
 
-  io.on('connection', (socket) => {
+  io.on('connection', async (socket) => {
     const userId = socket.userId;
     console.log(`User ${userId} connected with socket ${socket.id}`);
     
     // Сохраняем активное подключение
     activeUsers.set(userId, socket.id);
+
+    // Обновляем lastSeen при подключении
+    try {
+      await User.update(
+        { lastSeen: new Date() },
+        { where: { id: userId } }
+      );
+    } catch (error) {
+      console.error('Error updating lastSeen on socket connection:', error);
+    }
 
     // Уведомляем всех друзей о том, что пользователь онлайн
     socket.broadcast.emit('user-online', { userId });

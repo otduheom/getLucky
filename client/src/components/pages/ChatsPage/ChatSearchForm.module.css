@@ -1,0 +1,59 @@
+.searchContainer {
+  position: relative;
+  margin-bottom: 0;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  border: none;
+  border-radius: 0;
+  background: #ffffff;
+  font-size: 15px;
+  color: #212121;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.searchInput::placeholder {
+  color: #999999;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .searchInput {
+    padding: 8px 14px 8px 36px;
+    font-size: 14px;
+  }
+
+  .searchIcon {
+    left: 10px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .searchInput {
+    padding: 6px 12px 6px 32px;
+    font-size: 14px;
+  }
+
+  .searchIcon {
+    left: 8px;
+    width: 14px;
+    height: 14px;
+  }
+}
+

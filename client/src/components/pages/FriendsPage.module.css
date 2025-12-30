@@ -1,0 +1,112 @@
+.pageContainer {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0 0 24px 0;
+  color: #212121;
+}
+
+.tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tab {
+  padding: 8px 16px;
+  background-color: transparent;
+  color: #333;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  color: #3390ec;
+}
+
+.tab.active {
+  background-color: #3390ec;
+  color: white;
+  border-bottom-color: #3390ec;
+}
+
+.tab.active:hover {
+  background-color: #2d7fd1;
+  border-bottom-color: #2d7fd1;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #707579;
+}
+
+.error {
+  color: #dc3545;
+  padding: 24px;
+}
+
+.emptySearch {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 16px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  .tabs {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .tab {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageContainer {
+    padding: 12px;
+  }
+
+  .title {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+  }
+
+  .tabs {
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .tab {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
+
+  .emptySearch {
+    padding: 24px 12px;
+    font-size: 14px;
+  }
+}
+
