@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import UserAvatar from '../../ui/UserAvatar';
 import styles from './ChatHeader.module.css';
+import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 
 interface ChatHeaderProps {
   friendName: string;
