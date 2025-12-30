@@ -12,12 +12,18 @@ const PORT = process.env.PORT || 3001;
 const httpServer = createServer(app);
 
 // Настраиваем Socket.io
+// В продакшене разрешаем подключения с того же домена, в разработке - из CLIENT_URL
+const socketCorsOrigin = process.env.NODE_ENV === 'production' 
+  ? true // В продакшене разрешаем все подключения с того же домена
+  : (process.env.CLIENT_URL || "http://localhost:5173");
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: socketCorsOrigin,
     methods: ["GET", "POST"],
     credentials: true
-  }
+  },
+  allowEIO3: true, // Поддержка старых версий клиентов
 });
 
 // Сохраняем экземпляр io для использования в контроллерах

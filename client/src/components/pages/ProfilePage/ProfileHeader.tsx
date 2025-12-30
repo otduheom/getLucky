@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import UserAvatar from '../../ui/UserAvatar';
 import ProfileApi, { Profile } from '../../../entities/profile/ProfileApi';
+import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 
 interface ProfileHeaderProps {
     profile: Profile;
@@ -47,7 +48,7 @@ const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
               style={{ cursor: isOwnProfile ? 'pointer' : 'default' }}
             >
               <UserAvatar 
-                src={profile.avatar ? `http://localhost:3001${profile.avatar}` : undefined}
+                src={getAvatarUrl(profile.avatar)}
                 name={profile.name} 
                 size="lg" 
               />

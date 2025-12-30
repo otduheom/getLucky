@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import UserAvatar from '../../ui/UserAvatar';
 import FriendsApi, { Friend } from '../../../entities/friends/FriendsApi';
+import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 
 interface FriendRequestItemProps {
   requestId: number;
@@ -62,7 +63,7 @@ export default function FriendRequestItem({ requestId, user, onAccepted }: Frien
         onClick={() => navigate(`/profile/${user.id}`)}
       >
         <UserAvatar 
-          src={user.avatar ? `http://localhost:3001${user.avatar}` : undefined}
+          src={getAvatarUrl(user.avatar)}
           name={user.name} 
           size="md" 
         />

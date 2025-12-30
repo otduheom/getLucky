@@ -5,6 +5,7 @@ import MessageButton from '../../ui/MessageButton';
 import FriendsApi, { Friend } from '../../../entities/friends/FriendsApi';
 import { useState } from 'react';
 import styles from './FriendItem.module.css';
+import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 
 interface FriendItemProps {
   friend: Friend;
@@ -49,7 +50,7 @@ export default function FriendItem({ friend, isOnline, onFriendRemoved }: Friend
     >
       <div className={styles.avatarContainer}>
         <UserAvatar 
-          src={friend.avatar ? `http://localhost:3001${friend.avatar}` : undefined}
+          src={getAvatarUrl(friend.avatar)}
           name={friend.name} 
           size="md" 
         />

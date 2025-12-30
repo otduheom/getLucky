@@ -3,6 +3,7 @@ import UserAvatar from '../../ui/UserAvatar';
 import AddFriendButton from '../../ui/AddFriendButton';
 import FriendsApi, { Friend } from '../../../entities/friends/FriendsApi';
 import styles from './UserCard.module.css';
+import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 
 interface UserCardProps {
     user: Friend;
@@ -28,7 +29,7 @@ export default function UserCard({ user }: UserCardProps) {
                 className={styles.profileSection}
             >
                 <UserAvatar 
-                    src={user.avatar ? `http://localhost:3001${user.avatar}` : undefined} 
+                    src={getAvatarUrl(user.avatar)} 
                     name={user.name} 
                     size="lg"
                 />

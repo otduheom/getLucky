@@ -3,6 +3,8 @@ import MessagesApi, { Chat } from '../../entities/messages/MessagesApi';
 import ChatsList from './ChatsPage/ChatsList';
 import ChatSearchForm from './ChatsPage/ChatSearchForm';
 import styles from './ChatsPage/ChatsPage.module.css';
+import { initSocket } from '../../shared/lib/socketInstance';
+import { getAccessToken } from '../../shared/lib/axiosInstance';
 
 export default function ChatsPage() {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -26,6 +28,21 @@ export default function ChatsPage() {
     };
 
     fetchChats();
+
+    // Инициализация WebSocket для обновления списка чатов в реальном времени
+    const token = getAccessToken();
+    if (token) {
+      const socket = initSocket(token);
+
+      socket.on('chats-updated', (updatedChats: Chat[]) => {
+        setChats(updatedChats);
+        setDisplayedChats(updatedChats);
+      });
+
+      return () => {
+        socket.off('chats-updated');
+      };
+    }
   }, []);
 
   const handleSearchResults = (results: Chat[]) => {

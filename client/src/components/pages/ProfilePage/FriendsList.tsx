@@ -4,6 +4,7 @@ import FriendsApi, { Friend } from '../../../entities/friends/FriendsApi';
 import UserAvatar from '../../ui/UserAvatar';
 import OnlineIndicator from '../../ui/OnlineIndicator';
 import MessageButton from '../../ui/MessageButton';
+import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 
 interface FriendsListProps {
   userId: number;
@@ -86,7 +87,7 @@ export default function FriendsList({ userId, isOwnProfile, currentUserId }: Fri
           >
             <div style={{ position: 'relative' }}>
               <UserAvatar 
-                src={friend.avatar ? `http://localhost:3001${friend.avatar}` : undefined}
+                src={getAvatarUrl(friend.avatar)}
                 name={friend.name} 
                 size="md" 
               />

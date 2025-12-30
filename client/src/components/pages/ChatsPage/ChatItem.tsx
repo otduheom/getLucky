@@ -3,6 +3,7 @@ import UserAvatar from '../../ui/UserAvatar';
 import UnreadBadge from '../../ui/UnreadBadge';
 import { Chat } from '../../../entities/messages/MessagesApi';
 import styles from './ChatItem.module.css';
+import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 
 interface ChatItemProps {
   chat: Chat;
@@ -39,7 +40,7 @@ export default function ChatItem({ chat }: ChatItemProps) {
     <div onClick={handleChatClick} className={styles.chatItem}>
       <div className={styles.avatarContainer}>
         <UserAvatar
-          src={chat.friend.avatar ? `http://localhost:3001${chat.friend.avatar}` : undefined}
+          src={getAvatarUrl(chat.friend.avatar)}
           name={displayName}
           size="md"
         />

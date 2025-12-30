@@ -19,7 +19,7 @@ export default function ChatHeader({ friendName, friendAvatar, isOnline, friendI
   return (
     <div className={styles.header}>
       <div onClick={handleAvatarClick} className={styles.avatarContainer} style={{ cursor: 'pointer' }}>
-        <UserAvatar src={friendAvatar ? `http://localhost:3001${friendAvatar}` : undefined} name={friendName} size="md" />
+        <UserAvatar src={getAvatarUrl(friendAvatar)} name={friendName} size="md" />
       </div>
       <div className={styles.info}>
         <h3 className={styles.name}>{friendName}</h3>
