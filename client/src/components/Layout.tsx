@@ -1,5 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router';
+import { ToastContainer } from 'react-toastify';
 import Header from './ui/Header';
 import styles from './Layout.module.css';
 
@@ -21,6 +22,7 @@ function Layout({ user, setUser }: LayoutProps) {
       <div className={styles.content}>
         <Outlet />
       </div>
+      <ToastContainer />
     </div>
   );
 }

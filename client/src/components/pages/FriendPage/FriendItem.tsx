@@ -6,6 +6,7 @@ import FriendsApi, { Friend } from '../../../entities/friends/FriendsApi';
 import { useState } from 'react';
 import styles from './FriendItem.module.css';
 import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
+import { showToast } from '../../../shared/lib/toast';
 
 interface FriendItemProps {
   friend: Friend;
@@ -32,7 +33,7 @@ export default function FriendItem({ friend, isOnline, onFriendRemoved }: Friend
       await FriendsApi.removeFriend(friend.id);
       onFriendRemoved?.();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Ошибка удаления друга');
+      showToast.error(error.response?.data?.message || 'Ошибка удаления друга');
     } finally {
       setIsRemoving(false);
     }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import MessagesApi, { Chat } from '../../entities/messages/MessagesApi';
 import ChatsList from './ChatsPage/ChatsList';
 import ChatSearchForm from './ChatsPage/ChatSearchForm';
@@ -7,6 +8,7 @@ import { initSocket } from '../../shared/lib/socketInstance';
 import { getAccessToken } from '../../shared/lib/axiosInstance';
 
 export default function ChatsPage() {
+  const navigate = useNavigate();
   const [chats, setChats] = useState<Chat[]>([]);
   const [displayedChats, setDisplayedChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,6 +75,12 @@ export default function ChatsPage() {
     <div className={styles.pageContainer}>
       <div className={styles.header}>
         <h1 className={styles.title}>Чаты</h1>
+        <button
+          onClick={() => navigate('/groups/create')}
+          className={styles.createButton}
+        >
+          + Создать группу
+        </button>
       </div>
       <div className={styles.content}>
         <div className={styles.searchContainer}>

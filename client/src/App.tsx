@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router';
+import 'react-toastify/dist/ReactToastify.css';
 import ErrorPage from './components/pages/ErrorPage';
 import MainPage from './components/pages/MainPage';
 import Layout from './components/Layout';
@@ -11,6 +12,8 @@ import ProfilePage from './components/pages/ProfilePage';
 import FriendsPage from './components/pages/FriendsPage';
 import ChatsPage from './components/pages/ChatsPage';
 import ChatPage from './components/pages/ChatPage';
+import CreateGroupPage from './components/pages/CreateGroupPage';
+import GroupChatPage from './components/pages/GroupChatPage';
 
 
 interface User {
@@ -31,7 +34,11 @@ function App() {
         setUser({ status: 'logged', data: res.data.user });
         setAccessToken(res.data.accessToken);
       })
-      .catch(() => {
+      .catch((error) => {
+        // 401 - это нормально для неавторизованного пользователя, не логируем
+        if (error.response?.status !== 401) {
+          console.error('Ошибка при проверке авторизации:', error);
+        }
         setUser({ status: 'guest', data: null });
         setAccessToken('');
       });
@@ -78,6 +85,22 @@ function App() {
             element: (
               <ProtectedRoute isAllowed={!isGuest} redirectTo="/login">
                 <ChatPage currentUserId={user?.data?.id} />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: '/groups/create',
+            element: (
+              <ProtectedRoute isAllowed={!isGuest} redirectTo="/login">
+                <CreateGroupPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: '/chat/group/:groupId',
+            element: (
+              <ProtectedRoute isAllowed={!isGuest} redirectTo="/login">
+                <GroupChatPage currentUserId={user?.data?.id} />
               </ProtectedRoute>
             ),
           },

@@ -30,9 +30,11 @@ app.get('/api/my-cookie', (req, res) => {
   res.send('done');
 });
 
+// Раздача статических файлов (должно быть после API маршрутов)
 app.use(express.static(path.join(__dirname, '..', 'dist')));
 
-app.use((req, res) => {
+// Catch-all маршрут для SPA (должен быть последним)
+app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
 });
 

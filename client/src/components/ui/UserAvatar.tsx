@@ -8,6 +8,7 @@ interface UserAvatarProps {
 }
 
 export default function UserAvatar({ src, name, size = 'md', className }: UserAvatarProps) {
+  // если нет src, то показываем инициалы
   const initials = name
     .split(' ')
     .map(word => word[0])

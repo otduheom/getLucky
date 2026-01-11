@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router';
 import UserAvatar from '../../ui/UserAvatar';
 import FriendsApi, { Friend } from '../../../entities/friends/FriendsApi';
 import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
+import { showToast } from '../../../shared/lib/toast';
 
 interface FriendRequestItemProps {
   requestId: number;
@@ -15,15 +16,15 @@ export default function FriendRequestItem({ requestId, user, onAccepted }: Frien
   const handleAccept = async () => {
     if (!requestId) {
       console.error('requestId is undefined!', { requestId, user });
-      alert('Ошибка: не указан ID заявки');
+      showToast.error('Ошибка: не указан ID заявки');
       return;
     }
     try {
       await FriendsApi.acceptFriendRequest(requestId);
       onAccepted();
-      alert('Заявка принята');
+      showToast.success('Заявка принята');
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Ошибка принятия заявки');
+      showToast.error(error.response?.data?.message || 'Ошибка принятия заявки');
     }
   };
 
@@ -37,7 +38,7 @@ export default function FriendRequestItem({ requestId, user, onAccepted }: Frien
       await FriendsApi.removeFriend(user.id);
       onAccepted(); // Перезагружаем список
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Ошибка отклонения заявки');
+      showToast.error(error.response?.data?.message || 'Ошибка отклонения заявки');
     }
   };
 

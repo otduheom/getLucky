@@ -16,7 +16,7 @@ interface HeaderProps {
 
 function Header({ user, setUser }: HeaderProps) {
   const navigate = useNavigate();
-
+// обработчик выхода, при выходе из аккаунта дает текущему юзеру статус гостя, сбрасывает токен и выкидывает юзера на главную
   const logoutHandler = async () => {
     try {
       await UserApi.logout();

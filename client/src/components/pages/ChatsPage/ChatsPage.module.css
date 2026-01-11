@@ -11,6 +11,9 @@
   padding: 16px 20px;
   border-bottom: 1px solid #e0e0e0;
   background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .title {
@@ -18,6 +21,22 @@
   font-size: 24px;
   font-weight: 600;
   color: #212121;
+}
+
+.createButton {
+  padding: 8px 16px;
+  background-color: #3390ec;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.createButton:hover {
+  background-color: #2d7fd1;
 }
 
 .content {

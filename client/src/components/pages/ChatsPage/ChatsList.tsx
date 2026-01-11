@@ -16,9 +16,14 @@ export default function ChatsList({ chats }: ChatsListProps) {
 
   return (
     <div>
-      {chats.map((chat) => (
-        <ChatItem key={chat.friend.id} chat={chat} />
-      ))}
+      {chats.map((chat) => {
+        const key = chat.type === 'private' && chat.friend
+          ? `private-${chat.friend.id}`
+          : chat.type === 'group' && chat.group
+            ? `group-${chat.group.id}`
+            : `chat-${Math.random()}`;
+        return <ChatItem key={key} chat={chat} />;
+      })}
     </div>
   );
 }

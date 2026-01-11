@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import UserAvatar from '../../ui/UserAvatar';
 import ProfileApi, { Profile } from '../../../entities/profile/ProfileApi';
 import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
+import { showToast } from '../../../shared/lib/toast';
 
 interface ProfileHeaderProps {
     profile: Profile;
@@ -27,9 +28,9 @@ const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try{
         const updatedProfile = await ProfileApi.uploadAvatar(file);
         onProfileUpdate(updatedProfile);
-        alert('Аватар успешно обновлен');
+        showToast.success('Аватар успешно обновлен');
     } catch(err: any) {
-        alert(err.response?.data?.message || 'Ошибка при обновлении аватара');
+        showToast.error(err.response?.data?.message || 'Ошибка при обновлении аватара');
     } finally {
         setIsUploading(false);
         if(fileInputRef.current) {
@@ -76,7 +77,6 @@ const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
           </div>
         </div>
       );
-
 }
 
     

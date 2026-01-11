@@ -13,7 +13,11 @@ export default function ChatItem({ chat }: ChatItemProps) {
   const navigate = useNavigate();
 
   const handleChatClick = () => {
-    navigate(`/chat/${chat.friend.id}`);
+    if (chat.type === 'private' && chat.friend) {
+      navigate(`/chat/${chat.friend.id}`);
+    } else if (chat.type === 'group' && chat.group) {
+      navigate(`/chat/group/${chat.group.id}`);
+    }
   };
 
   const formatTime = (dateString: string) => {
@@ -31,16 +35,30 @@ export default function ChatItem({ chat }: ChatItemProps) {
     return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
   };
 
-  const displayName = chat.friend.nickname || 
-    (chat.friend.firstName && chat.friend.lastName 
-      ? `${chat.friend.firstName} ${chat.friend.lastName}` 
-      : chat.friend.name);
+  // Для личных чатов
+  const displayName = chat.type === 'private' && chat.friend
+    ? (chat.friend.nickname || 
+        (chat.friend.firstName && chat.friend.lastName 
+          ? `${chat.friend.firstName} ${chat.friend.lastName}` 
+          : chat.friend.name))
+    : // Для групповых чатов
+      (chat.type === 'group' && chat.group ? chat.group.name : '');
+
+  const avatar = chat.type === 'private' && chat.friend
+    ? chat.friend.avatar
+    : (chat.type === 'group' && chat.group ? chat.group.avatar : undefined);
+
+  const lastMessageText = chat.lastMessage
+    ? (chat.type === 'group' && chat.lastMessage.sender
+        ? `${chat.lastMessage.sender.name}: ${chat.lastMessage.text}`
+        : chat.lastMessage.text)
+    : null;
 
   return (
     <div onClick={handleChatClick} className={styles.chatItem}>
       <div className={styles.avatarContainer}>
         <UserAvatar
-          src={getAvatarUrl(chat.friend.avatar)}
+          src={getAvatarUrl(avatar)}
           name={displayName}
           size="md"
         />
@@ -55,9 +73,9 @@ export default function ChatItem({ chat }: ChatItemProps) {
           )}
         </div>
         <div className={styles.bottomRow}>
-          {chat.lastMessage && (
+          {lastMessageText && (
             <p className={styles.lastMessage}>
-              {chat.lastMessage.text}
+              {lastMessageText}
             </p>
           )}
           {chat.unreadCount > 0 && (

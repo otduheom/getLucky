@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import ProfileApi, { Profile } from '../../../entities/profile/ProfileApi';
+import { showToast } from '../../../shared/lib/toast';
 
 interface ProfileEditFormProps {
   profile: Profile;
@@ -36,10 +37,10 @@ export default function ProfileEditForm({ profile, onProfileUpdate, onCancel }: 
 
       const updatedProfile = await ProfileApi.updateProfile(updateData);
       onProfileUpdate(updatedProfile);
-      alert('Профиль успешно обновлен');
+      showToast.success('Профиль успешно обновлен');
       onCancel();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Ошибка обновления профиля');
+      showToast.error(error.response?.data?.message || 'Ошибка обновления профиля');
     } finally {
       setLoading(false);
     }

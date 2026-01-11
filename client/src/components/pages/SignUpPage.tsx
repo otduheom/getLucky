@@ -4,6 +4,7 @@ import UserApi from '../../entities/user/UserApi';
 import UserValidate from '../../entities/user/UserValidate';
 import { useNavigate } from 'react-router';
 import { setAccessToken } from '../../shared/lib/axiosInstance';
+import { showToast } from '../../shared/lib/toast';
 
 interface SignUpPageProps {
   setUser: (user: {
@@ -28,7 +29,7 @@ export default function SignUpPage({ setUser }: SignUpPageProps) {
         confirmPassword: string;
       });
 
-      if (!isValid) return alert(error);
+      if (!isValid) return showToast.error(error);
 
       const res = await UserApi.signup(formData as {
         name: string;
@@ -41,7 +42,7 @@ export default function SignUpPage({ setUser }: SignUpPageProps) {
       navigate('/');
     } catch (error: any) {
       console.log(error);
-      alert(error.response?.data?.message);
+      showToast.error(error.response?.data?.message || 'Ошибка регистрации');
     }
   };
 

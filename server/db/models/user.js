@@ -31,6 +31,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'receiverId',
         as: 'receivedMessages',
       });
+
+      // Пользователь принадлежит многим группам
+      User.belongsToMany(models.Group, {
+        through: models.GroupMember,
+        as: 'groups',
+        foreignKey: 'userId',
+        otherKey: 'groupId',
+      });
     }
 
     static validateEmail(email) {

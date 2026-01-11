@@ -1,6 +1,7 @@
 import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from 'react';
 import MessagesApi from '../../../entities/messages/MessagesApi';
 import { Message } from '../../../entities/messages/MessagesApi';
+import { showToast } from '../../../shared/lib/toast';
 import styles from './MessageInput.module.css';
 
 interface MessageInputProps {
@@ -33,7 +34,7 @@ export default function MessageInput({ receiverId, onMessageSent }: MessageInput
       const message = await MessagesApi.sendMessage(receiverId, messageText);
       onMessageSent(message);
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Ошибка отправки сообщения');
+      showToast.error(error.response?.data?.message || 'Ошибка отправки сообщения');
       setText(messageText); // Восстанавливаем текст при ошибке
     } finally {
       setLoading(false);

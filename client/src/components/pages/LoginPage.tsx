@@ -4,6 +4,7 @@ import UserApi from '../../entities/user/UserApi';
 import UserValidate from '../../entities/user/UserValidate';
 import { useNavigate } from 'react-router';
 import { setAccessToken } from '../../shared/lib/axiosInstance';
+import { showToast } from '../../shared/lib/toast';
 
 interface LoginPageProps {
   setUser: (user: {
@@ -22,14 +23,14 @@ export default function LoginPage({ setUser }: LoginPageProps) {
       e.preventDefault();
       const formData = Object.fromEntries(new FormData(e.currentTarget));
       const { isValid, error } = UserValidate.validateLoginData(formData as { email: string; password: string });
-      if (!isValid) return alert(error);
+      if (!isValid) return showToast.error(error);
       const res = await UserApi.login(formData as { email: string; password: string });
       setUser({ status: 'logged', data: res.data.user });
       setAccessToken(res.data.accessToken);
       navigate('/');
     } catch (error: any) {
       console.log(error);
-      alert(error.response?.data?.message);
+      showToast.error(error.response?.data?.message || 'Ошибка входа');
     }
   };
 

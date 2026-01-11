@@ -19,12 +19,17 @@ export default function ChatSearchForm({ chats, onSearchResults }: ChatSearchFor
 
     const query = searchQuery.toLowerCase().trim();
     const filtered = chats.filter(chat => {
-      const friendName = (chat.friend.nickname || 
-        (chat.friend.firstName && chat.friend.lastName 
-          ? `${chat.friend.firstName} ${chat.friend.lastName}` 
-          : chat.friend.name)).toLowerCase();
+      let chatName = '';
+      if (chat.type === 'private' && chat.friend) {
+        chatName = (chat.friend.nickname || 
+          (chat.friend.firstName && chat.friend.lastName 
+            ? `${chat.friend.firstName} ${chat.friend.lastName}` 
+            : chat.friend.name)).toLowerCase();
+      } else if (chat.type === 'group' && chat.group) {
+        chatName = chat.group.name.toLowerCase();
+      }
       const lastMessageText = chat.lastMessage?.text.toLowerCase() || '';
-      return friendName.includes(query) || lastMessageText.includes(query);
+      return chatName.includes(query) || lastMessageText.includes(query);
     });
 
     onSearchResults(filtered);
@@ -41,12 +46,17 @@ export default function ChatSearchForm({ chats, onSearchResults }: ChatSearchFor
 
     const query = value.toLowerCase().trim();
     const filtered = chats.filter(chat => {
-      const friendName = (chat.friend.nickname || 
-        (chat.friend.firstName && chat.friend.lastName 
-          ? `${chat.friend.firstName} ${chat.friend.lastName}` 
-          : chat.friend.name)).toLowerCase();
+      let chatName = '';
+      if (chat.type === 'private' && chat.friend) {
+        chatName = (chat.friend.nickname || 
+          (chat.friend.firstName && chat.friend.lastName 
+            ? `${chat.friend.firstName} ${chat.friend.lastName}` 
+            : chat.friend.name)).toLowerCase();
+      } else if (chat.type === 'group' && chat.group) {
+        chatName = chat.group.name.toLowerCase();
+      }
       const lastMessageText = chat.lastMessage?.text.toLowerCase() || '';
-      return friendName.includes(query) || lastMessageText.includes(query);
+      return chatName.includes(query) || lastMessageText.includes(query);
     });
 
     onSearchResults(filtered);

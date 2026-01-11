@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'receiverId',
         as: 'receiver',
       });
+      Message.belongsTo(models.Group, {
+        foreignKey: 'groupId',
+        as: 'group',
+      });
     }
   }
   Message.init(
@@ -27,9 +31,17 @@ module.exports = (sequelize, DataTypes) => {
       },
       receiverId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: 'Users',
+          key: 'id',
+        },
+      },
+      groupId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Groups',
           key: 'id',
         },
       },
