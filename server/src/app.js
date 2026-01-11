@@ -31,11 +31,25 @@ app.get('/api/my-cookie', (req, res) => {
 });
 
 // Раздача статических файлов (должно быть после API маршрутов)
-app.use(express.static(path.join(__dirname, '..', 'dist')));
+const distPath = path.join(__dirname, '..', 'dist');
+console.log('Dist path:', distPath);
+const fs = require('fs');
+if (!fs.existsSync(distPath)) {
+  console.error(`⚠️  Директория dist не найдена: ${distPath}`);
+  console.error('Убедитесь, что клиент собран: cd client && npm run build');
+} else {
+  console.log('✅ Директория dist найдена');
+}
+app.use(express.static(distPath));
 
 // Catch-all маршрут для SPA (должен быть последним)
 app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
+  const indexPath = path.join(distPath, 'index.html');
+  if (!fs.existsSync(indexPath)) {
+    console.error(`⚠️  Файл index.html не найден: ${indexPath}`);
+    return res.status(404).send('Client build not found. Please build the client first.');
+  }
+  res.sendFile(indexPath);
 });
 
 // const PORT = process.env.PORT || 3001;

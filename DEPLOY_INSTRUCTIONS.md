@@ -57,6 +57,7 @@ git push -u origin main
    - **Root Directory**: оставьте пустым (корень проекта)
 
    **Build & Deploy:**
+   - **Root Directory**: оставьте **ПУСТЫМ** (корень проекта)
    - **Build Command**: 
      ```bash
      cd client && npm install && npm run build && cd ../server && npm install
@@ -65,6 +66,7 @@ git push -u origin main
      ```bash
      cd server && npm start
      ```
+     ⚠️ **ВАЖНО**: Команда должна начинаться с `cd server &&`, иначе Render не найдет package.json!
    - **Environment**: `Node`
 
 4. Перейдите в раздел **Environment Variables** и добавьте:
