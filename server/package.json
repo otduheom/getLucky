@@ -7,7 +7,7 @@
     "db:reset": "sequelize db:drop && sequelize db:create && sequelize db:migrate && sequelize db:seed:all",
     "db:remigrate": "sequelize db:migrate:undo:all && sequelize db:migrate && sequelize db:seed:all",
     "db:setup": "cross-env NODE_ENV=production npx sequelize db:migrate && cross-env NODE_ENV=production npx sequelize db:seed:all",
-  "start": "cross-env NODE_ENV=production node src/server.js"
+  "start": "node src/server.js"
   },
   "keywords": [],
   "author": "",
