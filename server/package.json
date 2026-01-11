@@ -16,7 +16,6 @@
   "devDependencies": {
     "@elbrus/eslint-config": "^1.0.0",
     "@eslint/js": "^9.19.0",
-    "cross-env": "^10.1.0",
     "eslint": "^9.19.0",
     "globals": "^15.14.0",
     "nodemon": "^3.1.9",
@@ -27,6 +26,7 @@
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "cross-env": "^10.1.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "gigachat": "^0.0.18",
