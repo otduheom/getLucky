@@ -1,31 +1,8 @@
-import { useEffect, useState } from 'react';
-import FriendsApi, { Friend } from '../../../entities/friends/FriendsApi';
+import { useGetFriendRequestsQuery } from '../../../features/friends/friendsApi';
 import FriendRequestItem from './FriendRequestItem';
 
 export default function FriendRequestsList() {
-  const [requests, setRequests] = useState<Array<{ id: number; user: Friend; createdAt: string }>>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchRequests = async () => {
-    try {
-      setLoading(true);
-      const friendRequests = await FriendsApi.getFriendRequests();
-      console.log('Заявки в друзья:', friendRequests); // Для отладки
-      setRequests(friendRequests);
-    } catch (error: any) {
-      console.error('Ошибка загрузки заявок:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRequests();
-  }, []);
-
-  const handleRequestAccepted = () => {
-    fetchRequests(); // Перезагружаем список после принятия заявки
-  };
+  const { data: requests = [], isLoading: loading } = useGetFriendRequestsQuery();
 
   if (loading) {
     return <div>Загрузка заявок...</div>;
@@ -49,7 +26,6 @@ export default function FriendRequestsList() {
               key={request.id}
               requestId={request.id}
               user={request.user}
-              onAccepted={handleRequestAccepted}
             />
           );
         })}

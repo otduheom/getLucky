@@ -1,36 +1,18 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router';
-import FriendsApi, { Friend } from '../../entities/friends/FriendsApi';
-import GroupsApi from '../../entities/groups/GroupsApi';
+import { useGetFriendsQuery, Friend } from '../../features/friends/friendsApi';
+import { useCreateGroupMutation } from '../../features/groups/groupsApi';
 import styles from './CreateGroupPage.module.css';
 import { showToast } from '../../shared/lib/toast';
 
 export default function CreateGroupPage() {
   const navigate = useNavigate();
-  const [friends, setFriends] = useState<Friend[]>([]);
+  const { data: friends = [], isLoading: loading, error: friendsError } = useGetFriendsQuery();
+  const [createGroup, { isLoading: creating }] = useCreateGroupMutation();
   const [selectedFriendIds, setSelectedFriendIds] = useState<number[]>([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const friendsList = await FriendsApi.getFriends();
-        setFriends(friendsList);
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Ошибка загрузки друзей');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFriends();
-  }, []);
 
   const handleFriendToggle = (friendId: number) => {
     setSelectedFriendIds((prev) =>
@@ -48,23 +30,20 @@ export default function CreateGroupPage() {
       return;
     }
 
-    setCreating(true);
     setError(null);
 
     try {
-      const group = await GroupsApi.createGroup(
-        name.trim(),
-        description.trim() || undefined,
-        selectedFriendIds,
-      );
+      const group = await createGroup({
+        name: name.trim(),
+        description: description.trim() || undefined,
+        memberIds: selectedFriendIds,
+      }).unwrap();
       showToast.success('Группа успешно создана');
       navigate(`/chat/group/${group.id}`);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Ошибка создания группы';
+      const errorMessage = err.data?.message || err.message || 'Ошибка создания группы';
       setError(errorMessage);
       showToast.error(errorMessage);
-    } finally {
-      setCreating(false);
     }
   };
 
@@ -72,6 +51,18 @@ export default function CreateGroupPage() {
     return (
       <div className={styles.pageContainer}>
         <div className={styles.loading}>Загрузка друзей...</div>
+      </div>
+    );
+  }
+
+  if (friendsError) {
+    return (
+      <div className={styles.pageContainer}>
+        <div className={styles.error}>
+          {'data' in friendsError
+            ? (friendsError.data as any)?.message || 'Ошибка загрузки друзей'
+            : 'Ошибка загрузки друзей'}
+        </div>
       </div>
     );
   }

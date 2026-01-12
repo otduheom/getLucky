@@ -1,17 +1,15 @@
 import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from 'react';
-import MessagesApi from '../../../entities/messages/MessagesApi';
-import { Message } from '../../../entities/messages/MessagesApi';
+import { useSendMessageMutation } from '../../../features/messages/messagesApi';
 import { showToast } from '../../../shared/lib/toast';
 import styles from './MessageInput.module.css';
 
 interface MessageInputProps {
   receiverId: number;
-  onMessageSent: (message: Message) => void;
 }
 
-export default function MessageInput({ receiverId, onMessageSent }: MessageInputProps) {
+export default function MessageInput({ receiverId }: MessageInputProps) {
   const [text, setText] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [sendMessage, { isLoading: loading }] = useSendMessageMutation();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -28,16 +26,12 @@ export default function MessageInput({ receiverId, onMessageSent }: MessageInput
 
     const messageText = text.trim();
     setText('');
-    setLoading(true);
 
     try {
-      const message = await MessagesApi.sendMessage(receiverId, messageText);
-      onMessageSent(message);
+      await sendMessage({ receiverId, text: messageText }).unwrap();
     } catch (error: any) {
-      showToast.error(error.response?.data?.message || 'Ошибка отправки сообщения');
+      showToast.error(error.data?.message || error.message || 'Ошибка отправки сообщения');
       setText(messageText); // Восстанавливаем текст при ошибке
-    } finally {
-      setLoading(false);
     }
   };
 

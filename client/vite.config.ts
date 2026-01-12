@@ -1,16 +1,35 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      babel: {
+        plugins: [
+          [
+            'babel-plugin-react-compiler',
+            {
+              runtimeModule: 'react-compiler-runtime',
+              target: '18',
+            },
+          ],
+        ],
+      },
+    }),
+  ],
+  resolve: {
+    alias: {
+      'react/compiler-runtime': 'react-compiler-runtime',
+    },
+  },
   server: {
     proxy: {
-      "/api": "http://localhost:3001",
+      '/api': 'http://localhost:3001',
     },
   },
   build: {
-    outDir: '../server/dist'
+    outDir: '../server/dist',
   },
   base: '/',
 });

@@ -1,101 +1,52 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import MessagesApi, { Message } from '../../entities/messages/MessagesApi';
-import GroupsApi, { Group } from '../../entities/groups/GroupsApi';
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { useGetGroupMessagesQuery, useMarkGroupMessagesAsReadMutation } from '../../features/messages/messagesApi';
+import { useGetGroupQuery } from '../../features/groups/groupsApi';
+import { setActiveChat } from '../../features/messages/messagesSlice';
+import { setActiveGroup } from '../../features/groups/groupsSlice';
 import GroupChatHeader from './GroupChatPage/GroupChatHeader';
 import GroupMessagesList from './GroupChatPage/GroupMessagesList';
 import GroupMessageInput from './GroupChatPage/GroupMessageInput';
-import { initSocket } from '../../shared/lib/socketInstance';
-import { getAccessToken } from '../../shared/lib/axiosInstance';
 import styles from './ChatPage/ChatPage.module.css';
 
-interface GroupChatPageProps {
-  currentUserId?: number;
-}
-
-export default function GroupChatPage({ currentUserId }: GroupChatPageProps) {
+export default function GroupChatPage() {
   const { groupId } = useParams<{ groupId: string }>();
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [group, setGroup] = useState<Group | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const currentUserId = useAppSelector((state) => state.auth.user?.id);
+  const dispatch = useAppDispatch();
+
+  const groupIdNum = groupId ? parseInt(groupId, 10) : null;
+
+  const {
+    data: messages = [],
+    isLoading: messagesLoading,
+    error: messagesError,
+  } = useGetGroupMessagesQuery(groupIdNum!, { skip: !groupIdNum });
+
+  const {
+    data: group,
+    isLoading: groupLoading,
+    error: groupError,
+  } = useGetGroupQuery(groupIdNum!, { skip: !groupIdNum });
+
+  const [markGroupMessagesAsRead] = useMarkGroupMessagesAsReadMutation();
 
   useEffect(() => {
-    if (!groupId || !currentUserId) return;
-
-    const groupIdNum = parseInt(groupId, 10);
-
-    const fetchChatData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Получаем сообщения группы
-        const messagesList = await MessagesApi.getGroupMessages(groupIdNum);
-        setMessages(messagesList);
-
-        // Получаем информацию о группе
-        try {
-          const groupData = await GroupsApi.getGroup(groupIdNum);
-          setGroup(groupData);
-        } catch (err) {
-          setError('Группа не найдена');
-        }
-
-        // Отмечаем сообщения как прочитанные
-        await MessagesApi.markGroupMessagesAsRead(groupIdNum);
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Ошибка загрузки чата');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChatData();
-
-    // Инициализация WebSocket
-    const token = getAccessToken();
-    if (token) {
-      const socket = initSocket(token);
-
-      socket.on('new-group-message', (newMessage: Message) => {
-        if (newMessage.groupId === groupIdNum) {
-          setMessages((prev) => {
-            // Проверяем, нет ли уже такого сообщения (избегаем дубликатов)
-            if (prev.some((msg) => msg.id === newMessage.id)) {
-              return prev;
-            }
-            return [...prev, newMessage];
-          });
-          // Отмечаем как прочитанное
-          if (newMessage.senderId !== currentUserId) {
-            MessagesApi.markGroupMessagesAsRead(groupIdNum);
-          }
-        }
-      });
-
-      // Убираем обработчик chats-updated, так как сообщения обновляются через new-group-message
-      // и handleMessageSent. Полная перезагрузка не нужна и вызывает ререндер страницы.
-
-      return () => {
-        socket.off('new-group-message');
-      };
+    if (groupIdNum) {
+      dispatch(setActiveChat({ chatId: groupIdNum, type: 'group' }));
+      dispatch(setActiveGroup(groupIdNum));
+      // Отмечаем сообщения как прочитанные при открытии чата
+      markGroupMessagesAsRead(groupIdNum);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupId, currentUserId]);
+    return () => {
+      dispatch(setActiveChat(null));
+      dispatch(setActiveGroup(null));
+    };
+  }, [groupIdNum, dispatch, markGroupMessagesAsRead]);
 
-  const handleMessageSent = (message: Message) => {
-    setMessages((prev) => {
-      const existingIndex = prev.findIndex((msg) => msg.id === message.id);
-      if (existingIndex >= 0) {
-        const updated = [...prev];
-        updated[existingIndex] = message;
-        return updated;
-      }
-      return [...prev, message];
-    });
-  };
+  const loading = messagesLoading || groupLoading;
+  const error = messagesError || groupError;
 
   if (loading) {
     return (
@@ -111,7 +62,11 @@ export default function GroupChatPage({ currentUserId }: GroupChatPageProps) {
     return (
       <div className={styles.chatContainer}>
         <div style={{ padding: '24px', color: 'red' }}>
-          {error || 'Группа не найдена'}
+          {error
+            ? 'data' in error
+              ? (error.data as any)?.message || 'Ошибка загрузки чата'
+              : 'Ошибка загрузки чата'
+            : 'Группа не найдена'}
         </div>
         <button onClick={() => navigate('/chats')} style={{ margin: '16px' }}>
           Вернуться к чатам
@@ -124,7 +79,7 @@ export default function GroupChatPage({ currentUserId }: GroupChatPageProps) {
     <div className={styles.chatContainer}>
       <GroupChatHeader group={group} currentUserId={currentUserId} />
       <GroupMessagesList messages={messages} currentUserId={currentUserId} />
-      <GroupMessageInput groupId={parseInt(groupId, 10)} onMessageSent={handleMessageSent} />
+      <GroupMessageInput groupId={parseInt(groupId, 10)} />
     </div>
   );
 }

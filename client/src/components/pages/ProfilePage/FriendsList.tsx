@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import FriendsApi, { Friend } from '../../../entities/friends/FriendsApi';
+import { useGetFriendsQuery } from '../../../features/friends/friendsApi';
+import { Friend } from '../../../features/friends/friendsApi';
+import { useAppSelector } from '../../../app/hooks';
 import UserAvatar from '../../ui/UserAvatar';
 import OnlineIndicator from '../../ui/OnlineIndicator';
 import MessageButton from '../../ui/MessageButton';
@@ -13,32 +14,11 @@ interface FriendsListProps {
 }
 
 export default function FriendsList({ userId, isOwnProfile, currentUserId }: FriendsListProps) {
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [onlineFriends, setOnlineFriends] = useState<number[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: friends = [], isLoading: loading } = useGetFriendsQuery(undefined, {
+    skip: !isOwnProfile,
+  });
+  const onlineFriends = useAppSelector((state) => state.friends.onlineFriends);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        setLoading(true);
-        const friendsList = await FriendsApi.getFriends();
-        setFriends(friendsList);
-
-        // Получаем список онлайн друзей
-        const online = await FriendsApi.getOnlineFriends();
-        setOnlineFriends(online.map(f => f.id));
-      } catch (error: any) {
-        console.error('Ошибка загрузки друзей:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (isOwnProfile) {
-      fetchFriends();
-    }
-  }, [userId, isOwnProfile]);
 
   const isOnline = (friendId: number) => {
     return onlineFriends.includes(friendId);

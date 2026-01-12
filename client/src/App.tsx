@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router';
 import 'react-toastify/dist/ReactToastify.css';
 import ErrorPage from './components/pages/ErrorPage';
@@ -6,7 +6,6 @@ import MainPage from './components/pages/MainPage';
 import Layout from './components/Layout';
 import LoginPage from './components/pages/LoginPage';
 import SignUpPage from './components/pages/SignUpPage';
-import axiosInstance, { setAccessToken } from './shared/lib/axiosInstance';
 import ProtectedRoute from './components/HOCs/ProtectedRoute';
 import ProfilePage from './components/pages/ProfilePage';
 import FriendsPage from './components/pages/FriendsPage';
@@ -14,53 +13,33 @@ import ChatsPage from './components/pages/ChatsPage';
 import ChatPage from './components/pages/ChatPage';
 import CreateGroupPage from './components/pages/CreateGroupPage';
 import GroupChatPage from './components/pages/GroupChatPage';
-
-
-interface User {
-  status: 'logging' | 'logged' | 'guest';
-  data: {
-    id: number;  // Добавить id
-    name: string;
-    email: string;
-  } | null;
-}
+import { useAppSelector } from './app/hooks';
+import { useRefreshTokensQuery } from './features/auth/authApi';
 
 function App() {
-  const [user, setUser] = useState<User>({ status: 'logging', data: null });
+const auth = useAppSelector((state) => state.auth);
 
-  useEffect(() => {
-    axiosInstance('/auth/refreshTokens')
-      .then((res) => {
-        setUser({ status: 'logged', data: res.data.user });
-        setAccessToken(res.data.accessToken);
-      })
-      .catch((error) => {
-        // 401 - это нормально для неавторизованного пользователя, не логируем
-        if (error.response?.status !== 401) {
-          console.error('Ошибка при проверке авторизации:', error);
-        }
-        setUser({ status: 'guest', data: null });
-        setAccessToken('');
-      });
-  }, []);
+const  { isLoading } = useRefreshTokensQuery(undefined, {
+  skip: auth.status !== 'logging',
+});
 
   const router = useMemo(() => {
-    const isGuest = user?.status === 'guest';
+    const isGuest = auth.status === 'guest';
     return createBrowserRouter([
       {
         path: '/',
-        element: <Layout user={user} setUser={setUser} />,
+        element: <Layout />,
         errorElement: <ErrorPage />,
         children: [
           {
             path: '/',
-            element: <MainPage user={user} />,
+            element: <MainPage />,
           },
           {
             path: '/profile/:userId?',
             element: (
               <ProtectedRoute isAllowed={!isGuest} redirectTo="/login">
-                <ProfilePage currentUserId={user?.data?.id} />
+                <ProfilePage />
               </ProtectedRoute>
             ),
           },
@@ -84,7 +63,7 @@ function App() {
             path: '/chat/:friendId',
             element: (
               <ProtectedRoute isAllowed={!isGuest} redirectTo="/login">
-                <ChatPage currentUserId={user?.data?.id} />
+                <ChatPage />
               </ProtectedRoute>
             ),
           },
@@ -100,7 +79,7 @@ function App() {
             path: '/chat/group/:groupId',
             element: (
               <ProtectedRoute isAllowed={!isGuest} redirectTo="/login">
-                <GroupChatPage currentUserId={user?.data?.id} />
+                <GroupChatPage />
               </ProtectedRoute>
             ),
           },
@@ -108,7 +87,7 @@ function App() {
             path: '/signup',
             element: (
               <ProtectedRoute isAllowed={isGuest} redirectTo="/">
-                <SignUpPage setUser={setUser} />
+                <SignUpPage />
               </ProtectedRoute>
             ),
           },
@@ -116,16 +95,16 @@ function App() {
             path: '/login',
             element: (
               <ProtectedRoute isAllowed={isGuest} redirectTo="/">
-                <LoginPage setUser={setUser} />
+                <LoginPage />
               </ProtectedRoute>
             ),
           },
         ],
       },
     ]);
-  }, [user]);
+  }, [auth.status]);
 
-  if (user?.status === 'logging') {
+  if (auth.status === 'logging') {
     return null;
   }
   return <RouterProvider router={router} />;

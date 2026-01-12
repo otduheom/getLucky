@@ -1,17 +1,20 @@
 import { useNavigate } from 'react-router';
 import UserAvatar from '../../ui/UserAvatar';
-import FriendsApi, { Friend } from '../../../entities/friends/FriendsApi';
+import { Friend } from '../../../features/friends/friendsApi';
+import { useAcceptFriendRequestMutation, useRemoveFriendMutation } from '../../../features/friends/friendsApi';
 import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 import { showToast } from '../../../shared/lib/toast';
 
 interface FriendRequestItemProps {
   requestId: number;
   user: Friend;
-  onAccepted: () => void;
+  onAccepted?: () => void;
 }
 
 export default function FriendRequestItem({ requestId, user, onAccepted }: FriendRequestItemProps) {
   const navigate = useNavigate();
+  const [acceptFriendRequest] = useAcceptFriendRequestMutation();
+  const [removeFriend] = useRemoveFriendMutation();
 
   const handleAccept = async () => {
     if (!requestId) {
@@ -20,11 +23,11 @@ export default function FriendRequestItem({ requestId, user, onAccepted }: Frien
       return;
     }
     try {
-      await FriendsApi.acceptFriendRequest(requestId);
-      onAccepted();
+      await acceptFriendRequest(requestId).unwrap();
+      onAccepted?.();
       showToast.success('Заявка принята');
     } catch (error: any) {
-      showToast.error(error.response?.data?.message || 'Ошибка принятия заявки');
+      showToast.error(error.data?.message || error.message || 'Ошибка принятия заявки');
     }
   };
 
@@ -35,10 +38,10 @@ export default function FriendRequestItem({ requestId, user, onAccepted }: Frien
     }
     try {
       // Используем removeFriend для отклонения/удаления заявки
-      await FriendsApi.removeFriend(user.id);
-      onAccepted(); // Перезагружаем список
+      await removeFriend(user.id).unwrap();
+      onAccepted?.(); // Перезагружаем список
     } catch (error: any) {
-      showToast.error(error.response?.data?.message || 'Ошибка отклонения заявки');
+      showToast.error(error.data?.message || error.message || 'Ошибка отклонения заявки');
     }
   };
 

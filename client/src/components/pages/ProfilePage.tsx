@@ -1,59 +1,44 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router';
-import ProfileApi, { Profile } from '../../entities/profile/ProfileApi';
+import { useAppSelector } from '../../app/hooks';
+import { useGetProfileQuery, Profile } from '../../features/profile/profileApi';
 import ProfileHeader from './ProfilePage/ProfileHeader';
 import ProfileEditForm from './ProfilePage/ProfileEditForm';
 import FriendsList from './ProfilePage/FriendsList';
 import AddFriendButton from '../ui/AddFriendButton';
 import FriendshipActions from './ProfilePage/FriendshipActions';
 
-interface ProfilePageProps {
-  currentUserId?: number; // ID текущего пользователя
-}
-
-export default function ProfilePage({ currentUserId }: ProfilePageProps) {
+export default function ProfilePage() {
   const { userId } = useParams<{ userId?: string }>();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
+  const currentUserId = useAppSelector((state) => state.auth.user?.id);
   const profileUserId = userId ? parseInt(userId, 10) : currentUserId;
   const isOwnProfile = profileUserId === currentUserId;
+  const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!profileUserId) {
-        setError('Пользователь не найден');
-        setLoading(false);
-        return;
-      }
+  const {
+    data: profile,
+    isLoading: loading,
+    error,
+  } = useGetProfileQuery(profileUserId!, { skip: !profileUserId });
 
-      try {
-        setLoading(true);
-        setError(null);
-        const profileData = await ProfileApi.getProfile(profileUserId);
-        setProfile(profileData);
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Ошибка загрузки профиля');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [profileUserId]);
-
-  const handleProfileUpdate = (updatedProfile: Profile) => {
-    setProfile(updatedProfile);
+  const handleProfileUpdate = () => {
+    // RTK Query автоматически обновит данные через инвалидацию тегов
   };
 
   if (loading) {
     return <div>Загрузка профиля...</div>;
   }
 
-  if (error || !profile) {
-    return <div style={{ color: 'red' }}>{error || 'Профиль не найден'}</div>;
+  if (error || (!profile && !loading)) {
+    return (
+      <div style={{ color: 'red' }}>
+        {error
+          ? 'data' in error
+            ? (error.data as any)?.message || 'Ошибка загрузки профиля'
+            : 'Ошибка загрузки профиля'
+          : 'Профиль не найден'}
+      </div>
+    );
   }
 
   return (

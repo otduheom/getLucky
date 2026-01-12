@@ -1,10 +1,10 @@
 import { useState, FormEvent } from 'react';
-import ProfileApi, { Profile } from '../../../entities/profile/ProfileApi';
+import { useUpdateProfileMutation, Profile } from '../../../features/profile/profileApi';
 import { showToast } from '../../../shared/lib/toast';
 
 interface ProfileEditFormProps {
   profile: Profile;
-  onProfileUpdate: (profile: Profile) => void;
+  onProfileUpdate: () => void;
   onCancel: () => void;
 }
 
@@ -18,11 +18,10 @@ export default function ProfileEditForm({ profile, onProfileUpdate, onCancel }: 
     city: profile.city || '',
     about: profile.about || '',
   });
-  const [loading, setLoading] = useState(false);
+  const [updateProfile, { isLoading: loading }] = useUpdateProfileMutation();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
       const updateData: Partial<Profile> = {
@@ -35,14 +34,12 @@ export default function ProfileEditForm({ profile, onProfileUpdate, onCancel }: 
         about: formData.about || undefined,
       };
 
-      const updatedProfile = await ProfileApi.updateProfile(updateData);
-      onProfileUpdate(updatedProfile);
+      await updateProfile(updateData).unwrap();
       showToast.success('Профиль успешно обновлен');
+      onProfileUpdate();
       onCancel();
     } catch (error: any) {
-      showToast.error(error.response?.data?.message || 'Ошибка обновления профиля');
-    } finally {
-      setLoading(false);
+      showToast.error(error.data?.message || error.message || 'Ошибка обновления профиля');
     }
   };
 

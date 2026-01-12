@@ -1,17 +1,15 @@
 import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from 'react';
-import MessagesApi from '../../../entities/messages/MessagesApi';
-import { Message } from '../../../entities/messages/MessagesApi';
+import { useSendGroupMessageMutation } from '../../../features/messages/messagesApi';
 import { showToast } from '../../../shared/lib/toast';
 import styles from '../ChatPage/MessageInput.module.css';
 
 interface GroupMessageInputProps {
   groupId: number;
-  onMessageSent: (message: Message) => void;
 }
 
-export default function GroupMessageInput({ groupId, onMessageSent }: GroupMessageInputProps) {
+export default function GroupMessageInput({ groupId }: GroupMessageInputProps) {
   const [text, setText] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [sendGroupMessage, { isLoading: loading }] = useSendGroupMessageMutation();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -28,16 +26,12 @@ export default function GroupMessageInput({ groupId, onMessageSent }: GroupMessa
 
     const messageText = text.trim();
     setText('');
-    setLoading(true);
 
     try {
-      const message = await MessagesApi.sendGroupMessage(groupId, messageText);
-      onMessageSent(message);
+      await sendGroupMessage({ groupId, text: messageText }).unwrap();
     } catch (error: any) {
-      showToast.error(error.response?.data?.message || 'Ошибка отправки сообщения');
+      showToast.error(error.data?.message || error.message || 'Ошибка отправки сообщения');
       setText(messageText); // Восстанавливаем текст при ошибке
-    } finally {
-      setLoading(false);
     }
   };
 

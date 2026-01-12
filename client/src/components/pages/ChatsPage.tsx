@@ -1,51 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import MessagesApi, { Chat } from '../../entities/messages/MessagesApi';
+import { useGetChatsQuery } from '../../features/messages/messagesApi';
+import { Chat } from '../../features/messages/messagesApi';
 import ChatsList from './ChatsPage/ChatsList';
 import ChatSearchForm from './ChatsPage/ChatSearchForm';
 import styles from './ChatsPage/ChatsPage.module.css';
-import { initSocket } from '../../shared/lib/socketInstance';
-import { getAccessToken } from '../../shared/lib/axiosInstance';
 
 export default function ChatsPage() {
   const navigate = useNavigate();
-  const [chats, setChats] = useState<Chat[]>([]);
+  const { data: chats = [], isLoading: loading, error } = useGetChatsQuery();
   const [displayedChats, setDisplayedChats] = useState<Chat[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
+  // Обновляем displayedChats при изменении chats
   useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const chatsList = await MessagesApi.getChats();
-        setChats(chatsList);
-        setDisplayedChats(chatsList);
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Ошибка загрузки чатов');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChats();
-
-    // Инициализация WebSocket для обновления списка чатов в реальном времени
-    const token = getAccessToken();
-    if (token) {
-      const socket = initSocket(token);
-
-      socket.on('chats-updated', (updatedChats: Chat[]) => {
-        setChats(updatedChats);
-        setDisplayedChats(updatedChats);
-      });
-
-      return () => {
-        socket.off('chats-updated');
-      };
-    }
-  }, []);
+    setDisplayedChats(chats);
+  }, [chats]);
 
   const handleSearchResults = (results: Chat[]) => {
     setDisplayedChats(results);
@@ -65,7 +34,7 @@ export default function ChatsPage() {
     return (
       <div className={styles.pageContainer}>
         <div style={{ padding: '24px', color: '#d32f2f' }}>
-          {error}
+          {'data' in error ? (error.data as any)?.message || 'Ошибка загрузки чатов' : 'Ошибка загрузки чатов'}
         </div>
       </div>
     );
@@ -87,7 +56,7 @@ export default function ChatsPage() {
           <ChatSearchForm chats={chats} onSearchResults={handleSearchResults} />
         </div>
         <div className={styles.chatsContainer}>
-          {displayedChats.length === 0 ? (
+          {displayedChats.length === 0 && !loading ? (
             <div className={styles.emptyState}>Чаты не найдены</div>
           ) : (
             <ChatsList chats={displayedChats} />

@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router';
 import UserAvatar from '../../ui/UserAvatar';
 import OnlineIndicator from '../../ui/OnlineIndicator';
 import MessageButton from '../../ui/MessageButton';
-import FriendsApi, { Friend } from '../../../entities/friends/FriendsApi';
-import { useState } from 'react';
+import { Friend } from '../../../features/friends/friendsApi';
+import { useRemoveFriendMutation } from '../../../features/friends/friendsApi';
 import styles from './FriendItem.module.css';
 import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 import { showToast } from '../../../shared/lib/toast';
@@ -16,7 +16,7 @@ interface FriendItemProps {
 
 export default function FriendItem({ friend, isOnline, onFriendRemoved }: FriendItemProps) {
   const navigate = useNavigate();
-  const [isRemoving, setIsRemoving] = useState(false);
+  const [removeFriend, { isLoading: isRemoving }] = useRemoveFriendMutation();
 
   const handleFriendClick = () => {
     navigate(`/profile/${friend.id}`);
@@ -28,14 +28,11 @@ export default function FriendItem({ friend, isOnline, onFriendRemoved }: Friend
       return;
     }
 
-    setIsRemoving(true);
     try {
-      await FriendsApi.removeFriend(friend.id);
+      await removeFriend(friend.id).unwrap();
       onFriendRemoved?.();
     } catch (error: any) {
-      showToast.error(error.response?.data?.message || 'Ошибка удаления друга');
-    } finally {
-      setIsRemoving(false);
+      showToast.error(error.data?.message || error.message || 'Ошибка удаления друга');
     }
   };
 

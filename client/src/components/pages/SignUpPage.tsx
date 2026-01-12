@@ -1,23 +1,16 @@
 import { FormEvent } from 'react';
 import styles from './SignUpPage.module.css';
-import UserApi from '../../entities/user/UserApi';
 import UserValidate from '../../entities/user/UserValidate';
 import { useNavigate } from 'react-router';
-import { setAccessToken } from '../../shared/lib/axiosInstance';
 import { showToast } from '../../shared/lib/toast';
+import { useSignupMutation } from '../../features/auth/authApi';
 
-interface SignUpPageProps {
-  setUser: (user: {
-    status: 'logging' | 'logged' | 'guest';
-    data: {
-      name: string;
-      email: string;
-    } | null;
-  }) => void;
-}
 
-export default function SignUpPage({ setUser }: SignUpPageProps) {
+
+export default function SignUpPage() {
   const navigate = useNavigate();
+  const [signup, {isLoading}] = useSignupMutation();
+
   const signUpHandler = async (e: FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
@@ -31,18 +24,11 @@ export default function SignUpPage({ setUser }: SignUpPageProps) {
 
       if (!isValid) return showToast.error(error);
 
-      const res = await UserApi.signup(formData as {
-        name: string;
-        email: string;
-        password: string;
-      });
-
-      setUser({ status: 'logged', data: res.data.user });
-      setAccessToken(res.data.accessToken);
+     await signup(formData as { name: string; email: string; password: string;}).unwrap();
       navigate('/');
     } catch (error: any) {
       console.log(error);
-      showToast.error(error.response?.data?.message || 'Ошибка регистрации');
+      showToast.error(error.data?.message || 'Ошибка регистрации');
     }
   };
 
@@ -65,8 +51,8 @@ export default function SignUpPage({ setUser }: SignUpPageProps) {
           <div className={styles.inputLabel}>Repeat Password</div>
           <input className={styles.input} name="confirmPassword" type="password" required />
         </div>
-        <button type="submit" className={styles.submitButton}>
-          Подтвердить
+        <button type="submit" disabled={isLoading} className={styles.submitButton}>
+          {isLoading ? 'Регистрация...' : 'Подтвердить'}
         </button>
       </form>
     </div>

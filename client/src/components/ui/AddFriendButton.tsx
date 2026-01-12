@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import FriendsApi from '../../entities/friends/FriendsApi';
+import { useGetFriendshipStatusQuery, useSendFriendRequestMutation } from '../../features/friends/friendsApi';
 import { showToast } from '../../shared/lib/toast';
 import styles from './AddFriendButton.module.css';
 
@@ -18,44 +18,35 @@ export default function AddFriendButton({
   isRequester: initialIsRequester,
   onStatusChange,
 }: AddFriendButtonProps) {
-  const [loading, setLoading] = useState(false);
+  const [sendFriendRequest, { isLoading: loading }] = useSendFriendRequestMutation();
+  const { data: friendshipStatus } = useGetFriendshipStatusQuery(userId, {
+    skip: !!initialStatus,
+  });
   const [status, setStatus] = useState<'none' | 'pending' | 'accepted' | 'blocked'>(
     initialStatus || 'none',
   );
   const [isRequester, setIsRequester] = useState(initialIsRequester || false);
 
   useEffect(() => {
-    // получение статуса с сервера если нет initialStatus
-    const fetchStatus = async () => {
-      try {
-        const friendshipStatus = await FriendsApi.getFriendshipStatus(userId);
-        setStatus(friendshipStatus.status);
-        setIsRequester(friendshipStatus.isRequester || false);
-        onStatusChange?.(friendshipStatus.status);
-      } catch (error) {
-        console.error('Ошибка получения статуса дружбы:', error);
-      }
-    };
-    // проверка статуса и установка статуса если нет initialStatus
-    if (!initialStatus) {
-      fetchStatus();
-    } else {
+    if (friendshipStatus) {
+      setStatus(friendshipStatus.status);
+      setIsRequester(friendshipStatus.isRequester || false);
+      onStatusChange?.(friendshipStatus.status);
+    } else if (initialStatus) {
       setStatus(initialStatus);
       setIsRequester(initialIsRequester || false);
     }
-  }, [userId, initialStatus, initialIsRequester, onStatusChange]);
+  }, [friendshipStatus, initialStatus, initialIsRequester, onStatusChange]);
 
   const handleClick = async () => {
     if (status === 'accepted') {
       return; // Уже друзья, кнопка не активна
     }
-    // показать загрузку
-    setLoading(true);
     try {
       // отправка заявки если статус none
       if (status === 'none') {
         // отправка заявки, изменение состояния и вызов колбеков
-        await FriendsApi.sendFriendRequest(userId);
+        await sendFriendRequest(userId).unwrap();
         setStatus('pending');
         setIsRequester(true);
         onStatusChange?.('pending');
@@ -67,10 +58,7 @@ export default function AddFriendButton({
       }
     } catch (error: any) {
       // отображение тоста ошибки
-      showToast.error(error.response?.data?.message || 'Ошибка отправки заявки');
-    } finally {
-      // скрытие загрузки
-      setLoading(false);
+      showToast.error(error.data?.message || error.message || 'Ошибка отправки заявки');
     }
   };
 // динамическое отображение текста кнопки в зависимости от статуса

@@ -1,30 +1,20 @@
 import { NavLink, useNavigate } from 'react-router';
-import UserApi from '../../entities/user/UserApi';
-import { setAccessToken } from '../../shared/lib/axiosInstance';
 import styles from './Header.module.css';
+import { useLogoutMutation } from '../../features/auth/authApi';
+import { useAppSelector } from '../../app/hooks';
 
-interface HeaderProps {
-  user: {
-    status: 'logging' | 'logged' | 'guest';
-    data: {
-      name: string;
-      email: string;
-    } | null;
-  };
-  setUser: (user: HeaderProps['user']) => void;
-}
-
-function Header({ user, setUser }: HeaderProps) {
+function Header() {
   const navigate = useNavigate();
-// обработчик выхода, при выходе из аккаунта дает текущему юзеру статус гостя, сбрасывает токен и выкидывает юзера на главную
+  const [logout] = useLogoutMutation();
+  const auth = useAppSelector((state) => state.auth);
+
   const logoutHandler = async () => {
     try {
-      await UserApi.logout();
-      setUser({ status: 'guest', data: null });
-      setAccessToken('');
+      await logout().unwrap();
       navigate('/');
     } catch (error) {
       console.log(error);
+      navigate('/');
     }
   };
 
@@ -38,7 +28,7 @@ function Header({ user, setUser }: HeaderProps) {
                 Главная
               </NavLink>
             </li>
-            {user?.status === 'logged' ? (
+            {auth.status === 'logged' ? (
               <>
                 <li>
                   <NavLink
@@ -69,7 +59,7 @@ function Header({ user, setUser }: HeaderProps) {
                     to="/profile"
                     className={styles.userName}
                   >
-                    {user?.data?.name}
+                    {auth.user?.name}
                   </NavLink>
                 </li>
                 <li>
